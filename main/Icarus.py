@@ -16,11 +16,11 @@ class PlayerSprite(arcade.Sprite):
 
     def draw(self):
         self.sync_with_model()
-        if self.model.py > self.model.y:
-            self.texture_id = ("./../images/character_sprites/qTBAk6eEc.png")
-        else:
-            self.texture_id = (
-                "./../images/character_sprites/4498da5568c62377df6e9bb32794d8d1--angel-wings-drawings-of.png")
+        # if self.model.py > self.model.y:
+        #     self.texture_id = ("./../images/character_sprites/qTBAk6eEc.png")
+        # else:
+        #     self.texture_id = (
+        #         "./../images/character_sprites/4498da5568c62377df6e9bb32794d8d1--angel-wings-drawings-of.png")
         super().draw()
 
 
@@ -35,7 +35,8 @@ class Window(arcade.Window):
     def start(self):
         self.world = World(SCREEN_WIDTH, SCREEN_HEIGHT)
 
-        self.dot_sprite = PlayerSprite(texture_id, model=self.world.player)
+        self.dot_sprite = PlayerSprite(
+            ".././images/1.png", model=self.world.player)
 
     def on_key_press(self, key, key_modifiers):
         if not self.world.is_started():
