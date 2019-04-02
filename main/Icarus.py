@@ -53,8 +53,6 @@ class Window(arcade.Window):
         arcade.start_render()
 
         self.dot_sprite.draw()
-        # for pillar_pair_sprite in self.pillar_pair_sprites:
-        #     pillar_pair_sprite.draw()
 
         arcade.draw_text(str(self.world.score),
                          self.width - 30, self.height - 30,
