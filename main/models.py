@@ -46,29 +46,6 @@ class Player:
         self.y += MOVEMENT_SPEED * DIR_OFFSETS[direction][1]
 
 
-# class PillarPair:
-    # PILLAR_SPEED = 5
-
-    # def __init__(self, world, x, y):
-    #     self.world = world
-    #     self.x = x
-    #     self.y = y
-
-    # def update(self, delta):
-    #     self.x -= PillarPair.PILLAR_SPEED
-    #     if self.x < -40:
-    #         self.x = self.world.width+40
-    #         self.random_position_y()
-    #     pass
-
-    # def hit(self, player):
-    #     return check_player_pillar_collision(player.x, player.y,
-    #                                          self.x, self.y)
-
-    # def random_position_y(self):
-    #     self.y = randint(100, 450)
-
-
 class World:
     STATE_FROZEN = 1
     STATE_STARTED = 2
@@ -77,8 +54,6 @@ class World:
     def __init__(self, width, height):
         self.width = width
         self.height = height
-        # self.pillar_pairs = [PillarPair(
-        #     self, width - 100, height // 2), PillarPair(self, width + 350, height // 2)]
 
         self.player = Player(self, width // 2, height // 2)
         self.state = World.STATE_FROZEN
@@ -91,15 +66,6 @@ class World:
         self.player.update(delta)
         if(self.player.togkob()):
             self.die()
-
-        # for pillar_pair in self.pillar_pairs:
-        #     pillar_pair.update(delta)
-
-        #     if pillar_pair.x == self.player.x:
-        #         self.score += 1
-
-        #     if pillar_pair.hit(self.player):
-        #         self.die()
 
     def on_key_press(self, key, key_modifiers):
         if key == arcade.key.UP:
