@@ -1,4 +1,3 @@
-# from coldetect import check_player_pillar_collision
 from random import randint
 import arcade.key
 
