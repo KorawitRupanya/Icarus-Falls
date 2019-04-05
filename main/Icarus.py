@@ -4,11 +4,21 @@ from models import World, Player, Arrow
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 800
 
+TEXTURE_UP = 0
+TEXTURE_DOWN = 1
+
 
 class PlayerSprite(arcade.Sprite):
     def __init__(self, *args, **kwargs):
         self.model = kwargs.pop('model', None)
         super().__init__(*args, **kwargs)
+        texture = arcade.load_texture(
+            ".././images/character_sprites/kitty1.png")
+        self.textures.append(texture)
+        texture = arcade.load_texture(
+            ".././images/character_sprites/kitty2.png")
+        self.textures.append(texture)
+        self.set_texture(TEXTURE_UP)
 
     def sync_with_model(self):
         if self.model:
@@ -16,18 +26,17 @@ class PlayerSprite(arcade.Sprite):
 
     def draw(self):
         self.sync_with_model()
-        # if self.model.py > self.model.y:
-        #     self.texture_id = ("./../images/character_sprites/qTBAk6eEc.png")
-        # else:
-        #     self.texture_id = (
-        #         "./../images/character_sprites/4498da5568c62377df6e9bb32794d8d1--angel-wings-drawings-of.png")
+        if self.model.py > self.model.y:
+            self.set_texture(TEXTURE_UP)
+        else:
+            self.set_texture(TEXTURE_DOWN)
         super().draw()
 
 
 class ArrowSprite(arcade.Sprite):
     def __init__(self, model):
         self.model = model
-        self.arrow_sprite = arcade.Sprite('.././images/Back ground/flame.png')
+        self.arrow_sprite = arcade.Sprite('.././images/Back ground/arrow.png')
 
     def draw(self):
         self.arrow_sprite.set_position(self.model.x, self.model.y)
@@ -50,7 +59,7 @@ class Window(arcade.Window):
         self.world = World(SCREEN_WIDTH, SCREEN_HEIGHT)
 
         self.dot_sprite = PlayerSprite(
-            ".././images/1.png", model=self.world.player)
+            model=self.world.player)
 
     def on_key_press(self, key, key_modifiers):
         if not self.world.is_started():
@@ -71,12 +80,12 @@ class Window(arcade.Window):
         arcade.start_render()
 
         self.draw_background()
-        self.dot_sprite.draw()
         for arrow in self.arrow_sprite:
             arrow.draw()
         arcade.draw_text(str(self.world.score),
                          self.width - 30, self.height - 30,
                          arcade.color.BLACK, 20)
+        self.dot_sprite.draw()
 
 
 def main():

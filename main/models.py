@@ -5,7 +5,9 @@ DIR_STILL = 0
 DIR_RIGHT = 1
 DIR_LEFT = 2
 MOVEMENT_SPEED = 4
-JUMP_SPEED = 15
+JUMP_SPEED = 5
+SCREEN_WIDTH = 600
+SCREEN_HEIGHT = 800
 
 KEY_MAP = {
     arcade.key.LEFT: DIR_LEFT,
@@ -17,15 +19,14 @@ DIR_OFFSETS = {DIR_STILL: (0, 0),
 
 
 class Player:
-    GRAVITY = 1
-    STARTING_VELOCITY = 15
-    JUMPING_VELOCITY = 15
+    GRAVITY = 0.10
+    JUMPING_VELOCITY = 0.05
 
     def __init__(self, world, x, y):
         self.world = world
         self.x = x
         self.y = y
-        self.vy = Player.STARTING_VELOCITY
+        self.vy = Player.JUMPING_VELOCITY
         self.next_direction = DIR_STILL
         self.direction = DIR_STILL
         self.py = 0
@@ -52,14 +53,14 @@ class Arrow:
         self.vy = 0.2
 
     def up_speed(self):
-        Coin.ARROW_SPEED += self.vy
+        Arrow.ARROW_SPEED += self.vy
 
     def is_position_negative(self):
         if self.y < 0:
             self.y = 0
 
     def update(self, delta):
-        self.y -= Coin.ARROW_SPEED
+        self.y -= Arrow.ARROW_SPEED
         self.is_position_negative()
         if self.y == 0:
             self.y = SCREEN_HEIGHT
@@ -81,9 +82,9 @@ class World:
         self.player = Player(self, width // 2, height // 2)
         self.state = World.STATE_FROZEN
         self.score = 0
-        self.arrow = [Arrow(self, width - 200, height), Arrow(self, width - 200, height + 100),
+        self.arrow = [Arrow(self, width - 40, height), Arrow(self, width - 60, height + 100),
                       Arrow(self, width - 200, height +
-                            200), Arrow(self, width - 200, height + 300),
+                            200), Arrow(self, width - 100, height + 300),
                       Arrow(self, width - 200, height + 400)]
 
     def update(self, delta):
@@ -91,6 +92,14 @@ class World:
             return
 
         self.player.update(delta)
+
+        for i in self.arrow:
+            i.update(delta)
+            # if i.hit(self.player):
+            #     self.increase_score()
+            #     self.up_level()
+            #     i.y = SCREEN_HEIGHT
+            #     i.random_position()
 
     def on_key_press(self, key, key_modifiers):
         if key == arcade.key.UP:
