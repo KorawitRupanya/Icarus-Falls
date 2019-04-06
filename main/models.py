@@ -6,8 +6,7 @@ DIR_RIGHT = 1
 DIR_LEFT = 2
 MOVEMENT_SPEED = 4
 JUMP_SPEED = 5
-SCREEN_WIDTH = 600
-SCREEN_HEIGHT = 800
+
 
 KEY_MAP = {
     arcade.key.LEFT: DIR_LEFT,
@@ -44,7 +43,7 @@ class Player:
 
 
 class Arrow:
-    ARROW_SPEED = 1
+    ARROW_SPEED = 5
 
     def __init__(self, world, x, y):
         self.world = world
@@ -61,10 +60,11 @@ class Arrow:
 
     def update(self, delta):
         self.y -= Arrow.ARROW_SPEED
-        self.is_position_negative()
-        if self.y == 0:
-            self.y = SCREEN_HEIGHT
+        # self.is_position_negative()
+        if self.y < -179:
+            self.y = self.world.height+179
             self.random_position()
+        pass
 
     def random_position(self):
         self.x = randint(50, 400)
