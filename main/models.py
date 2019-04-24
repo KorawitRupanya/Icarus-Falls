@@ -30,6 +30,7 @@ class Player:
         self.next_direction = DIR_STILL
         self.direction = DIR_STILL
         self.py = 0
+        # self.check = False
 
     def update(self, delta):
         self.py = self.y
@@ -113,6 +114,7 @@ class World:
         self.state = World.STATE_STARTED
 
     def freeze(self):
+
         self.state = World.STATE_FROZEN
 
     def is_started(self):

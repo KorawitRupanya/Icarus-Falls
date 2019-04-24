@@ -6,6 +6,8 @@ SCREEN_HEIGHT = 800
 
 TEXTURE_UP = 0
 TEXTURE_DOWN = 1
+TEXTURE_HURT_UP = 2
+TEXTURE_HURT_DOWN = 3
 
 
 class PlayerSprite(arcade.Sprite):
@@ -18,6 +20,12 @@ class PlayerSprite(arcade.Sprite):
         texture = arcade.load_texture(
             ".././images/character_sprites/kitty2.png")
         self.textures.append(texture)
+        texture = arcade.load_texture(
+            ".././images/character_sprites/kittyBurn1.png")
+        self.textures.append(texture)
+        texture = arcade.load_texture(
+            ".././images/character_sprites/kittyBurn2.png")
+        self.textures.append(texture)
         self.set_texture(TEXTURE_UP)
 
     def sync_with_model(self):
@@ -27,9 +35,15 @@ class PlayerSprite(arcade.Sprite):
     def draw(self):
         self.sync_with_model()
         if self.model.py > self.model.y:
-            self.set_texture(TEXTURE_UP)
+            if self.model.check:
+                self.set_texture(TEXTURE_HURT_UP)
+            else:
+                self.set_texture(TEXTURE_UP)
         else:
-            self.set_texture(TEXTURE_DOWN)
+            if self.model.check:
+                self.set_texture(TEXTURE_HURT_DOWN)
+            else:
+                self.set_texture(TEXTURE_DOWN)
         super().draw()
 
 
