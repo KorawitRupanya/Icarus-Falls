@@ -36,7 +36,8 @@ class PlayerSprite(arcade.Sprite):
 class ArrowSprite(arcade.Sprite):
     def __init__(self, model):
         self.model = model
-        self.arrow_sprite = arcade.Sprite('.././images/Object_sprites/arrow.png')
+        self.arrow_sprite = arcade.Sprite(
+            '.././images/Object_sprites/arrow.png')
 
     def draw(self):
         self.arrow_sprite.set_position(self.model.x, self.model.y)

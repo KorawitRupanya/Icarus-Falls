@@ -38,7 +38,6 @@ class Player:
         self.direction = self.next_direction
         self.move(self.direction)
 
-
     def move(self, direction):
         self.x += MOVEMENT_SPEED * DIR_OFFSETS[direction][0]
         self.y += MOVEMENT_SPEED * DIR_OFFSETS[direction][1]
@@ -70,7 +69,7 @@ class Arrow:
 
     def hit(self, player):
         return is_hit(player.x, player.y,
-                                             self.x, self.y)
+                      self.x, self.y)
 
     def random_position(self):
         self.x = randint(50, 400)
@@ -102,7 +101,7 @@ class World:
         for i in self.arrow:
             i.update(delta)
             if i.hit(self.player):
-                self.die()
+                self.freeze()
 
     def on_key_press(self, key, key_modifiers):
         if key == arcade.key.UP:
