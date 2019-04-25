@@ -30,7 +30,7 @@ class Player:
         self.next_direction = DIR_STILL
         self.direction = DIR_STILL
         self.py = 0
-        # self.check = False
+        self.check = False
 
     def update(self, delta):
         self.py = self.y
@@ -96,12 +96,13 @@ class World:
     def update(self, delta):
         if self.state in [World.STATE_FROZEN, World.STATE_DEAD]:
             return
-
+        self.player.check = False
         self.player.update(delta)
 
         for i in self.arrow:
             i.update(delta)
             if i.hit(self.player):
+                self.player.check = True
                 self.freeze()
 
     def on_key_press(self, key, key_modifiers):
