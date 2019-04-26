@@ -35,6 +35,10 @@ class Player:
     def update(self, delta):
         self.py = self.y
         self.y += self.vy
+        if self.x < -30:
+            self.x = self.world.width + 30
+        if self.x > self.world.width+30:
+            self.x = -30
         self.vy -= Player.GRAVITY
         self.direction = self.next_direction
         self.move(self.direction)
@@ -42,6 +46,15 @@ class Player:
     def move(self, direction):
         self.x += MOVEMENT_SPEED * DIR_OFFSETS[direction][0]
         self.y += MOVEMENT_SPEED * DIR_OFFSETS[direction][1]
+
+
+class Soil:
+    def __init__(self, world, x, y):
+        self.world = world
+        self.x = x
+        self.y = y
+        self.vx = 0
+        self.vy = 0
 
 
 class Arrow:
@@ -55,6 +68,9 @@ class Arrow:
 
     def up_speed(self):
         Arrow.ARROW_SPEED += self.vy
+
+    def freeze_arrow(self):
+        self.ARROW_SPEED = 0
 
     def is_position_negative(self):
         if self.y < 0:
@@ -100,10 +116,11 @@ class World:
         self.player.update(delta)
 
         for i in self.arrow:
-            i.update(delta)
             if i.hit(self.player):
                 self.player.check = True
-                self.freeze()
+                i.freeze_arrow()
+            else:
+                i.update(delta)
 
     def on_key_press(self, key, key_modifiers):
         if key == arcade.key.UP:
@@ -115,7 +132,6 @@ class World:
         self.state = World.STATE_STARTED
 
     def freeze(self):
-
         self.state = World.STATE_FROZEN
 
     def is_started(self):

@@ -1,7 +1,8 @@
 import arcade
+import subprocess
 from models import World, Player, Arrow
 
-SCREEN_WIDTH = 600
+SCREEN_WIDTH = 400
 SCREEN_HEIGHT = 800
 
 TEXTURE_UP = 0
@@ -63,8 +64,9 @@ class Window(arcade.Window):
         super().__init__(width, height)
 
         self.start()
+        self.offset = 0
         self.background = arcade.load_texture(
-            ".././images/Back ground/hell.jpg")
+            ".././images/Back ground/space.jpg")
         self.arrow_sprite = [ArrowSprite(model=self.world.arrow[0]), ArrowSprite(model=self.world.arrow[1]),
                              ArrowSprite(model=self.world.arrow[2]), ArrowSprite(
                                  model=self.world.arrow[3]),
@@ -83,13 +85,18 @@ class Window(arcade.Window):
         self.world.on_key_press(key, key_modifiers)
 
     def draw_background(self):
-        arcade.draw_texture_rectangle(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2,
+        arcade.draw_texture_rectangle(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + self.offset,
+                                      SCREEN_WIDTH, SCREEN_HEIGHT, self.background)
+        arcade.draw_texture_rectangle(SCREEN_WIDTH // 2, (SCREEN_HEIGHT // 2 + self.offset)-SCREEN_HEIGHT,
                                       SCREEN_WIDTH, SCREEN_HEIGHT, self.background)
 
     def update(self, delta):
         self.world.update(delta)
         if self.world.is_dead():
             self.start()
+        if self.world.is_started():
+            self.offset -= 1
+            self.offset %= SCREEN_HEIGHT
 
     def on_draw(self):
         arcade.start_render()
