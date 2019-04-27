@@ -1,14 +1,20 @@
 import arcade
 import subprocess
-from models import World, Player, Arrow
+from models import World, Player, Arrow, Fire
 
-SCREEN_WIDTH = 400
+SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 800
+SCREEN_TITLE = "Icarus Fall The Game"
 
 TEXTURE_UP = 0
 TEXTURE_DOWN = 1
 TEXTURE_HURT_UP = 2
 TEXTURE_HURT_DOWN = 3
+
+fire = []
+arrows = []
+
+n = 10
 
 
 class PlayerSprite(arcade.Sprite):
@@ -59,23 +65,36 @@ class ArrowSprite(arcade.Sprite):
         self.arrow_sprite.draw()
 
 
+class FireSprite(arcade.Sprite):
+    def __init__(self, model):
+        self.model = model
+        self.fire_sprite = arcade.Sprite(
+            '.././images/Object_sprites/fire1.png'
+        )
+
+    def draw(self):
+        self.fire_sprite.set_position(self.model.x, self.model.y)
+        self.fire_sprite.draw()
+
+
 class Window(arcade.Window):
-    def __init__(self, width, height):
-        super().__init__(width, height)
+    def __init__(self, width, height, title):
+        super().__init__(width, height, title)
 
         self.start()
         self.offset = 0
         self.background = arcade.load_texture(
-            ".././images/Back ground/space.jpg")
-        self.arrow_sprite = [ArrowSprite(model=self.world.arrow[0]), ArrowSprite(model=self.world.arrow[1]),
-                             ArrowSprite(model=self.world.arrow[2]), ArrowSprite(
-                                 model=self.world.arrow[3]),
-                             ArrowSprite(model=self.world.arrow[4])]
+            ".././images/Back ground/sky.jpg")
+        for i in range(n):
+            arrows.append(ArrowSprite(model=self.world.arrow[i]))
+        self.arrow_sprite = arrows
+        # for i in range(n):
+        # self.fire_sprite = [FireSprite(model=self.world.fire[n])]
 
     def start(self):
         self.world = World(SCREEN_WIDTH, SCREEN_HEIGHT)
 
-        self.dot_sprite = PlayerSprite(
+        self.player_sprite = PlayerSprite(
             model=self.world.player)
 
     def on_key_press(self, key, key_modifiers):
@@ -104,14 +123,16 @@ class Window(arcade.Window):
         self.draw_background()
         for arrow in self.arrow_sprite:
             arrow.draw()
-        arcade.draw_text(str(self.world.score),
+        arcade.draw_text(str(self.world.player.lp),
+                         self.width-570, self.height-30, arcade.color.BLACK, 20)
+        arcade.draw_text(str(int(self.world.score)),
                          self.width - 30, self.height - 30,
-                         arcade.color.BLACK, 20)
-        self.dot_sprite.draw()
+                         arcade.color.BLACK, 10)
+        self.player_sprite.draw()
 
 
 def main():
-    window = Window(SCREEN_WIDTH, SCREEN_HEIGHT)
+    window = Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
     arcade.set_window(window)
     arcade.run()
 

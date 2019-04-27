@@ -17,6 +17,10 @@ DIR_OFFSETS = {DIR_STILL: (0, 0),
                DIR_RIGHT: (1, 0),
                DIR_LEFT: (-1, 0)}
 
+arrows = []
+
+n = 10
+
 
 class Player:
     GRAVITY = 0.10
@@ -31,6 +35,7 @@ class Player:
         self.direction = DIR_STILL
         self.py = 0
         self.check = False
+        self.lp = 100
 
     def update(self, delta):
         self.py = self.y
@@ -40,6 +45,8 @@ class Player:
         if self.x > self.world.width+30:
             self.x = -30
         self.vy -= Player.GRAVITY
+        if(self.y - 50 < 0):
+            self.world.freeze()
         self.direction = self.next_direction
         self.move(self.direction)
 
@@ -57,17 +64,56 @@ class Soil:
         self.vy = 0
 
 
+class Fire:
+    def __init__(self, world, x, y, vx, vy):
+        self.world = world
+        self.x = x
+        self.y = y
+        self.vx = vx
+        self.vy = vy
+
+    def move(self):
+        self.x += self.vx
+        self.y += self.vy
+
+        if self.x > self.world.width - 60  \
+                or self.x < 60:
+            self.vx *= -1
+        if self.y > self.world.height - 60 \
+                or self.y < 60:
+            self.vy *= -1
+
+
 class Arrow:
     ARROW_SPEED = 5
 
     def __init__(self, world, x, y):
         self.world = world
-        self.x = x
+        self.x = randint(0, 600)
         self.y = y
-        self.vy = 0.2
+        self.vy = 0.1
 
     def up_speed(self):
-        Arrow.ARROW_SPEED += self.vy
+        if(self.world.score == 100):
+            Arrow.ARROW_SPEED += self.vy
+        if(self.world.score == 200):
+            Arrow.ARROW_SPEED += self.vy
+        if(self.world.score == 300):
+            Arrow.ARROW_SPEED += self.vy
+        if(self.world.score == 400):
+            Arrow.ARROW_SPEED += self.vy
+        if(self.world.score == 500):
+            Arrow.ARROW_SPEED += self.vy
+        if(self.world.score == 600):
+            Arrow.ARROW_SPEED += self.vy
+        if(self.world.score == 700):
+            Arrow.ARROW_SPEED += self.vy
+        if(self.world.score == 800):
+            Arrow.ARROW_SPEED += self.vy
+        if(self.world.score == 900):
+            Arrow.ARROW_SPEED += self.vy
+        if(self.world.score == 1000):
+            Arrow.ARROW_SPEED += self.vy
 
     def freeze_arrow(self):
         self.ARROW_SPEED = 0
@@ -78,18 +124,16 @@ class Arrow:
 
     def update(self, delta):
         self.y -= Arrow.ARROW_SPEED
+        self.up_speed()
         # self.is_position_negative()
         if self.y < -179:
             self.y = self.world.height+179
-            self.random_position()
+            self.x = randint(0, 600)
         pass
 
     def hit(self, player):
         return is_hit(player.x, player.y,
                       self.x, self.y)
-
-    def random_position(self):
-        self.x = randint(50, 400)
 
 
 class World:
@@ -104,23 +148,29 @@ class World:
         self.player = Player(self, width // 2, height // 2)
         self.state = World.STATE_FROZEN
         self.score = 0
-        self.arrow = [Arrow(self, width - 40, height), Arrow(self, width - 60, height + 100),
-                      Arrow(self, width - 200, height +
-                            200), Arrow(self, width - 100, height + 300),
-                      Arrow(self, width - 200, height + 400)]
+        for i in range(n):
+            arrows.append(
+                Arrow(self, width - randint(40, 200), height+randint(100, 400)))
+        pass
+        self.arrow = arrows
 
     def update(self, delta):
         if self.state in [World.STATE_FROZEN, World.STATE_DEAD]:
             return
         self.player.check = False
         self.player.update(delta)
-
         for i in self.arrow:
             if i.hit(self.player):
                 self.player.check = True
+                self.player.lp -= 1
                 i.freeze_arrow()
+
+            elif(self.player.lp < 0):
+                self.die()
             else:
                 i.update(delta)
+
+        self.score += 1
 
     def on_key_press(self, key, key_modifiers):
         if key == arcade.key.UP:
