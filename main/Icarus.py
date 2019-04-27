@@ -11,11 +11,6 @@ TEXTURE_DOWN = 1
 TEXTURE_HURT_UP = 2
 TEXTURE_HURT_DOWN = 3
 
-fire = []
-arrows = []
-
-n = 10
-
 
 class PlayerSprite(arcade.Sprite):
     def __init__(self, *args, **kwargs):
@@ -83,11 +78,12 @@ class Window(arcade.Window):
 
         self.start()
         self.offset = 0
+        self.arrows = []
         self.background = arcade.load_texture(
             ".././images/Back ground/sky.jpg")
-        for i in range(n):
-            arrows.append(ArrowSprite(model=self.world.arrow[i]))
-        self.arrow_sprite = arrows
+        for i in range(self.world.arrowNumbers):
+            self.arrows.append(ArrowSprite(model=self.world.arrow[i]))
+        self.arrow_sprite = self.arrows
         # for i in range(n):
         # self.fire_sprite = [FireSprite(model=self.world.fire[n])]
 

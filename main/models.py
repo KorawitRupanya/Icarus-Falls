@@ -17,10 +17,6 @@ DIR_OFFSETS = {DIR_STILL: (0, 0),
                DIR_RIGHT: (1, 0),
                DIR_LEFT: (-1, 0)}
 
-arrows = []
-
-n = 10
-
 
 class Player:
     GRAVITY = 0.10
@@ -44,6 +40,9 @@ class Player:
             self.x = self.world.width + 30
         if self.x > self.world.width+30:
             self.x = -30
+        if self.y+35 >= self.world.height:
+            self.vy = 0
+            self.vy -= Player.GRAVITY
         self.vy -= Player.GRAVITY
         if(self.y - 50 < 0):
             self.world.freeze()
@@ -91,28 +90,10 @@ class Arrow:
         self.world = world
         self.x = randint(0, 600)
         self.y = y
-        self.vy = 0.1
+        self.vy = 1
 
     def up_speed(self):
-        if(self.world.score == 100):
-            Arrow.ARROW_SPEED += self.vy
-        if(self.world.score == 200):
-            Arrow.ARROW_SPEED += self.vy
-        if(self.world.score == 300):
-            Arrow.ARROW_SPEED += self.vy
-        if(self.world.score == 400):
-            Arrow.ARROW_SPEED += self.vy
-        if(self.world.score == 500):
-            Arrow.ARROW_SPEED += self.vy
-        if(self.world.score == 600):
-            Arrow.ARROW_SPEED += self.vy
-        if(self.world.score == 700):
-            Arrow.ARROW_SPEED += self.vy
-        if(self.world.score == 800):
-            Arrow.ARROW_SPEED += self.vy
-        if(self.world.score == 900):
-            Arrow.ARROW_SPEED += self.vy
-        if(self.world.score == 1000):
+        if(self.world.score % 100 == 0):
             Arrow.ARROW_SPEED += self.vy
 
     def freeze_arrow(self):
@@ -144,15 +125,16 @@ class World:
     def __init__(self, width, height):
         self.width = width
         self.height = height
-
+        self.arrowNumbers = 5
+        self.arrows = []
         self.player = Player(self, width // 2, height // 2)
         self.state = World.STATE_FROZEN
         self.score = 0
-        for i in range(n):
-            arrows.append(
+        for i in range(self.arrowNumbers):
+            self.arrows.append(
                 Arrow(self, width - randint(40, 200), height+randint(100, 400)))
         pass
-        self.arrow = arrows
+        self.arrow = self.arrows
 
     def update(self, delta):
         if self.state in [World.STATE_FROZEN, World.STATE_DEAD]:
