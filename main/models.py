@@ -41,8 +41,7 @@ class Player:
         if self.x > self.world.width+30:
             self.x = -30
         if self.y+35 >= self.world.height:
-            self.vy = 0
-            self.vy -= Player.GRAVITY
+            self.vy *= -1
         self.vy -= Player.GRAVITY
         if(self.y - 50 < 0):
             self.world.freeze()
