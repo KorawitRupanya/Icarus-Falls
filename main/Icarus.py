@@ -1,7 +1,6 @@
 import arcade
 import pygame
 import subprocess
-import os
 from models import World, Player, Arrow, Fire
 
 SCREEN_WIDTH = 600
@@ -12,6 +11,9 @@ TEXTURE_UP = 0
 TEXTURE_DOWN = 1
 TEXTURE_HURT_UP = 2
 TEXTURE_HURT_DOWN = 3
+
+FIRE_1 = 0
+FIRE_2 = 1
 
 
 class PlayerSprite(arcade.Sprite):
@@ -62,16 +64,68 @@ class ArrowSprite(arcade.Sprite):
         self.arrow_sprite.draw()
 
 
-class FireSprite(arcade.Sprite):
-    def __init__(self, model):
-        self.model = model
-        self.fire_sprite = arcade.Sprite(
-            '.././images/Object_sprites/fire1.png'
-        )
+class BottomFire(arcade.Sprite):
+    FIRE_IMAGE = ["fire1.png", "fire2.png"]
+    IS_FIRE_ONE = 0
+
+    def __init__(self, *args, **kwargs):
+        self.model = kwargs.pop('model', None)
+        super().__init__(*args, **kwargs)
+        texture = arcade.load_texture(
+            '.././images/Object_sprites/fire1.png')
+        self.textures.append(texture)
+        texture = arcade.load_texture(
+            '.././images/Object_sprites/fire2.png')
+        self.textures.append(texture)
+        self.set_texture(FIRE_1)
+        self.IS_FIRE_ONE = 0
+
+    def sync_with_model(self):
+        if self.model:
+            self.set_position(self.model.x, self.model.y)
 
     def draw(self):
-        self.fire_sprite.set_position(self.model.x, self.model.y)
-        self.fire_sprite.draw()
+        self.sync_with_model()
+        if self.IS_FIRE_ONE > 40:
+            self.IS_FIRE_ONE = 0
+        if self.IS_FIRE_ONE <= 20:
+            self.set_texture(FIRE_2)
+        else:
+            self.set_texture(FIRE_1)
+        self.IS_FIRE_ONE += 1
+        super().draw()
+
+
+class FireSprite(arcade.Sprite):
+    FIRE_IMAGE = ["fire1.png", "fire2.png"]
+    IS_FIRE_ONE = 0
+
+    def __init__(self, *args, **kwargs):
+        self.model = kwargs.pop('model', None)
+        super().__init__(*args, **kwargs)
+        texture = arcade.load_texture(
+            '.././images/Object_sprites/fire1.png')
+        self.textures.append(texture)
+        texture = arcade.load_texture(
+            '.././images/Object_sprites/fire2.png')
+        self.textures.append(texture)
+        self.set_texture(FIRE_1)
+        self.IS_FIRE_ONE = 0
+
+    def sync_with_model(self):
+        if self.model:
+            self.set_position(self.model.x, self.model.y)
+
+    def draw(self):
+        self.sync_with_model()
+        if self.IS_FIRE_ONE > 40:
+            self.IS_FIRE_ONE = 0
+        if self.IS_FIRE_ONE <= 20:
+            self.set_texture(FIRE_2)
+        else:
+            self.set_texture(FIRE_1)
+        self.IS_FIRE_ONE += 1
+        super().draw()
 
 
 class Window(arcade.Window):
@@ -79,10 +133,14 @@ class Window(arcade.Window):
         super().__init__(width, height, title)
 
         self.start()
+
+    def start(self):
+        self.world = World(SCREEN_WIDTH, SCREEN_HEIGHT)
         self.offset = 0
         self.arrows = []
         self.fires = []
         self.numArrow = 5
+        self.bottomFires = []
         self.background = arcade.load_texture(
             ".././images/Back ground/sky.jpg")
 
@@ -94,8 +152,9 @@ class Window(arcade.Window):
             self.fires.append(FireSprite(model=self.world.fire[n]))
         self.fire_sprite = self.fires
 
-    def start(self):
-        self.world = World(SCREEN_WIDTH, SCREEN_HEIGHT)
+        for i in range(10):
+            self.bottomFires.append(BottomFire(model=self.world.bottomfire[i]))
+        self.bottomfires_sprite = self.bottomFires
 
         self.player_sprite = PlayerSprite(
             model=self.world.player)
@@ -119,10 +178,15 @@ class Window(arcade.Window):
     def update(self, delta):
         self.world.update(delta)
         if self.world.is_dead():
-            self.start()
+            self.world.freeze()
+
         if self.world.is_started():
             self.offset -= 1
             self.offset %= SCREEN_HEIGHT
+
+        if (self.world.arrowNumbers != self.numArrow):
+            self.arrows.append(ArrowSprite(model=self.world.arrow[-1]))
+            self.numArrow = self.world.arrowNumbers
 
     def on_draw(self):
         arcade.start_render()
@@ -134,6 +198,9 @@ class Window(arcade.Window):
 
         for fire in self.fire_sprite:
             fire.draw()
+
+        for bf in self.bottomfires_sprite:
+            bf.draw()
 
         arcade.draw_text(str(int(self.world.score)),
                          25, self.height - 40,

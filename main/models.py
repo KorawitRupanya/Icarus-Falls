@@ -1,20 +1,23 @@
 from random import randint
-from detect import is_hit
+from detect import is_hit, fire_hit
 import arcade.key
 import math
-import os
 
+# moving attribute
 DIR_STILL = 0
 DIR_RIGHT = 1
 DIR_LEFT = 2
+
+# moving speed attribute
 MOVEMENT_SPEED = 4
 JUMP_SPEED = 5
 
-
+# map the keys with the attribute
 KEY_MAP = {
     arcade.key.LEFT: DIR_LEFT,
     arcade.key.RIGHT: DIR_RIGHT, }
 
+# offsets for moving keys
 DIR_OFFSETS = {DIR_STILL: (0, 0),
                DIR_RIGHT: (1, 0),
                DIR_LEFT: (-1, 0)}
@@ -36,29 +39,33 @@ class Player:
         self.lp = 100
 
     def update(self, delta):
-        self.py = self.y
-        self.y += self.vy
-        if self.x < -30:
-            self.x = self.world.width + 30
-        if self.x > self.world.width+30:
-            self.x = -30
-        if self.y+35 >= self.world.height:
-            self.vy *= -1
-        self.vy -= Player.GRAVITY
-        if self.y - 50 < 0:
-            self.world.freeze()
-        # if self.lp == 0:
-        #     self.cannotmove()
-        # else:
-        self.direction = self.next_direction
-        self.move(self.direction)
-
-    def cannotmove(self):
-        MOVEMENT_SPEED = 0
+        if self.lp > 0:
+            self.py = self.y
+            self.y += self.vy
+            if self.x < -30:
+                self.x = self.world.width + 30
+            if self.x > self.world.width+30:
+                self.x = -30
+            if self.y+35 >= self.world.height:
+                self.vy *= -1
+            self.vy -= Player.GRAVITY
+            if self.y <= 85:
+                self.lp = -1
+            else:
+                self.direction = self.next_direction
+                self.move(self.direction)
+            self.world.score += 1
 
     def move(self, direction):
         self.x += MOVEMENT_SPEED * DIR_OFFSETS[direction][0]
         self.y += MOVEMENT_SPEED * DIR_OFFSETS[direction][1]
+
+
+class BottomFire:
+    def __init__(self, world, x, y):
+        self.world = world
+        self.x = x
+        self.y = y
 
 
 class Fire:
@@ -73,28 +80,31 @@ class Fire:
         self.change_y = 0
 
     def update(self, delta):
+        if self.world.player.lp > 0:
+            if self.x <= 30 or self.y >= self.world.height - 49 or self.x >= self.world.width - 30:
+                self.change_x *= -1
+                self.change_y *= -1
 
-        self.x += self.change_x
-        self.y += self.change_y
+            self.x += self.change_x
+            self.y += self.change_y
 
-        if randint(0, 100) == 0:
-            start_x = self.x
-            start_y = self.y
+            if randint(0, 100) == 0:
+                start_x = self.x
+                start_y = self.y
 
-            dest_x = self.world.player.x
-            dest_y = self.world.player.y
+                dest_x = self.world.player.x
+                dest_y = self.world.player.y
 
-            # Do math to calculate how to get the bullet to the destination.
-            # Calculation the angle in radians between the start points
-            # and end points. This is the angle the bullet will travel.
-            x_diff = dest_x - start_x
-            y_diff = dest_y - start_y
-            angle = math.atan2(y_diff, x_diff)
+                x_diff = dest_x - start_x
+                y_diff = dest_y - start_y
+                angle = math.atan2(y_diff, x_diff)
 
-            # Taking into account the angle, calculate our change_x
-            # and change_y. Velocity is how fast the bullet travels.
-            self.change_x = math.cos(angle) * Fire.FIRE_SPEED
-            self.change_y = math.sin(angle) * Fire.FIRE_SPEED
+                self.change_x = math.cos(angle) * Fire.FIRE_SPEED
+                self.change_y = math.sin(angle) * Fire.FIRE_SPEED
+
+    def fire_hit(self, player):
+        return fire_hit(player.x, player.y,
+                        self.x, self.y)
 
 
 class Arrow:
@@ -120,7 +130,6 @@ class Arrow:
     def update(self, delta):
         self.y -= Arrow.ARROW_SPEED
         self.up_speed()
-        # self.is_position_negative()
         if self.y < -179:
             self.y = self.world.height+179
             self.x = randint(0, 600)
@@ -146,6 +155,8 @@ class World:
         self.fires = []
         self.state = World.STATE_FROZEN
         self.score = 0
+        self.bottomfire = []
+
         for i in range(self.arrowNumbers):
             self.arrows.append(
                 Arrow(self, width - randint(40, 200), height+randint(100, 400)))
@@ -154,20 +165,45 @@ class World:
 
         for i in range(self.fireNumbers):
             self.fires.append(
-                Fire(self, width//2, height//2)
+                Fire(self, width//2, -50)
             )
         self.fire = self.fires
 
+        self.generate_bottom_fire()
+
         sound = arcade.sound.load_sound(".././soundEffect/themeSong.wav")
         arcade.play_sound(sound)
+
+    def generate_bottom_fire(self):
+        self.bottomfire.append(BottomFire(self, 30, 30))
+        self.bottomfire.append(BottomFire(self, 90, 30))
+        self.bottomfire.append(BottomFire(self, 150, 30))
+        self.bottomfire.append(BottomFire(self, 210, 30))
+        self.bottomfire.append(BottomFire(self, 270, 30))
+        self.bottomfire.append(BottomFire(self, 330, 30))
+        self.bottomfire.append(BottomFire(self, 390, 30))
+        self.bottomfire.append(BottomFire(self, 450, 30))
+        self.bottomfire.append(BottomFire(self, 510, 30))
+        self.bottomfire.append(BottomFire(self, 570, 30))
 
     def update(self, delta):
         if self.state in [World.STATE_FROZEN, World.STATE_DEAD]:
             return
         self.player.check = False
         self.player.update(delta)
+
         for i in self.fires:
-            i.update(delta)
+            if i.fire_hit(self.player):
+                self.player.check = True
+                self.player.lp = -1
+            else:
+                i.update(delta)
+
+        if(self.score % 500 == 0):
+            self.arrowNumbers += 1
+            self.arrows.append(
+                Arrow(self, self.width - randint(40, 200), self.height+randint(100, 400)))
+
         for i in self.arrow:
             if i.hit(self.player):
                 self.player.check = True
@@ -178,8 +214,6 @@ class World:
                 self.die()
             else:
                 i.update(delta)
-
-        self.score += 1
 
     def on_key_press(self, key, key_modifiers):
         if key == arcade.key.UP:
