@@ -134,6 +134,11 @@ class Window(arcade.Window):
 
         self.start()
 
+        self.menu = {'score': arcade.load_texture(".././images/Back ground/loser-score-board.png"),
+                     'play': arcade.load_texture(".././images/Back ground/replay.png"),
+                     'credit': arcade.load_texture(".././images/Back ground/credit.png"),
+                     'quit': arcade.load_texture(".././images/Back ground/QuitButton.png")}
+
     def start(self):
         self.world = World(SCREEN_WIDTH, SCREEN_HEIGHT)
         self.offset = 0
@@ -212,6 +217,44 @@ class Window(arcade.Window):
         self.player_sprite.draw()
 
         self.draw_lp()
+
+        if self.world.player.lp == -1:
+            texture = self.menu['score']
+            arcade.draw_texture_rectangle(
+                self.width//2, self.height//2+200, texture.width, texture.height, texture, 0)
+            arcade.draw_text(str(int(self.world.score)),
+                             self.width//2-80, 475,
+                             arcade.color.WHITE, 100)
+            texture = self.menu['play']
+            arcade.draw_texture_rectangle(
+                self.width//2, self.height//2, texture.width, texture.height, texture, 0)
+            texture = self.menu['credit']
+            arcade.draw_texture_rectangle(
+                self.width//2, self.height//2-200, texture.width, texture.height, texture, 0)
+            texture = self.menu['quit']
+            arcade.draw_texture_rectangle(
+                self.width-60, self.height-55, texture.width, texture.height, texture, 0)
+
+    def replay(self, x, y):
+        if self.world.player.lp == -1:
+            if self.width//2-205 <= x <= self.width//2+205 and self.height//2-70 <= y <= self.height//2+70:
+                self.start()
+                self.world.start()
+
+    def credit(self, x, y):
+        if self.world.player.lp == -1:
+            if ((self.height//2)-200) - (95) <= y <= ((self.height//2)-200) + (95)and self.width//2-95 <= x <= self.width//2+95:
+                print('credit')
+
+    def quit_game(self, x, y):
+        if self.world.player.lp == -1:
+            if self.height-80 <= y <= self.height-20 and self.width-108 <= x <= self.width + 28:
+                exit()
+
+    def on_mouse_press(self, x, y, button, modifiers):
+        self.replay(x, y)
+        self.credit(x, y)
+        self.quit_game(x, y)
 
 
 def main():

@@ -2,6 +2,22 @@ from random import randint
 from detect import is_hit, fire_hit
 import arcade.key
 import math
+import pygame
+
+pygame.mixer.init()
+
+# Sound effect initialise
+century = pygame.mixer.Sound(
+    '.././soundEffect/C.wav')
+derp = pygame.mixer.Sound('.././soundEffect/Derp Sound Effect.wav')
+no_one = pygame.mixer.Sound('.././soundEffect/No One Has Ever Done That.wav')
+nope = pygame.mixer.Sound('.././soundEffect/Nope Sound Effect.wav')
+sad = pygame.mixer.Sound('.././soundEffect/Sad Violin Airhorn.wav')
+wow = pygame.mixer.Sound('.././soundEffect/WOW.wav')
+hot = pygame.mixer.Sound('.././soundEffect/HOT HOT HOT HOT.wav')
+
+music = pygame.mixer.music.load('.././soundEffect/music.mp3')
+pygame.mixer.music.play(-1)
 
 # moving attribute
 DIR_STILL = 0
@@ -51,6 +67,8 @@ class Player:
             self.vy -= Player.GRAVITY
             if self.y <= 85:
                 self.lp = -1
+                self.check = True
+                derp.play()
             else:
                 self.direction = self.next_direction
                 self.move(self.direction)
@@ -75,7 +93,7 @@ class Fire:
         self.world = world
         self.x = x
         self.y = y
-        self.plus_speed = 1
+        self.plus_speed = 0.1
         self.change_x = 0
         self.change_y = 0
 
@@ -108,27 +126,27 @@ class Fire:
 
 
 class Arrow:
-    ARROW_SPEED = 5
 
     def __init__(self, world, x, y):
         self.world = world
         self.x = randint(0, 600)
         self.y = y
+        self.speed = 5
         self.vy = 0.1
 
     def up_speed(self):
         if(self.world.score % 100 == 0):
-            Arrow.ARROW_SPEED += self.vy
+            self.speed += self.vy
 
     def freeze_arrow(self):
-        self.ARROW_SPEED = 0
+        self.speed = 0
 
     def is_position_negative(self):
         if self.y < 0:
             self.y = 0
 
     def update(self, delta):
-        self.y -= Arrow.ARROW_SPEED
+        self.y -= self.speed
         self.up_speed()
         if self.y < -179:
             self.y = self.world.height+179
@@ -171,8 +189,8 @@ class World:
 
         self.generate_bottom_fire()
 
-        sound = arcade.sound.load_sound(".././soundEffect/themeSong.wav")
-        arcade.play_sound(sound)
+        # sound = arcade.sound.load_sound(".././soundEffect/themeSong.wav")
+        # arcade.play_sound(sound)
 
     def generate_bottom_fire(self):
         self.bottomfire.append(BottomFire(self, 30, 30))
@@ -196,6 +214,7 @@ class World:
             if i.fire_hit(self.player):
                 self.player.check = True
                 self.player.lp = -1
+                hot.play()
             else:
                 i.update(delta)
 
@@ -208,18 +227,20 @@ class World:
             if i.hit(self.player):
                 self.player.check = True
                 self.player.lp -= 1
-                i.freeze_arrow()
-
+                nope.play()
             elif(self.player.lp < 0):
                 self.die()
+                self.player.lp = -1
+                nope.stop()
             else:
                 i.update(delta)
 
     def on_key_press(self, key, key_modifiers):
-        if key == arcade.key.UP:
-            self.player.vy = JUMP_SPEED
-        if key in KEY_MAP:
-            self.player.next_direction = KEY_MAP[key]
+        if self.player.lp > 0:
+            if key == arcade.key.UP:
+                self.player.vy = JUMP_SPEED
+            if key in KEY_MAP:
+                self.player.next_direction = KEY_MAP[key]
 
     def start(self):
         self.state = World.STATE_STARTED
