@@ -1,6 +1,6 @@
 # Icarus-Falls
 
-This is an endless arcade game.The player have to servie from the deathly arrow that will kill you and also get away from the hell flames that is on the bottom and also chasing you.
+This is an endless arcade game.A player have to survive from the deathly arrow that will kill you and also get away from the hell flames that is on the bottom and also chasing you.
 
 ## How to install
 
