@@ -129,6 +129,8 @@ class FireSprite(arcade.Sprite):
 
 
 class Window(arcade.Window):
+    show_credit = False
+
     def __init__(self, width, height, title):
         super().__init__(width, height, title)
 
@@ -187,6 +189,7 @@ class Window(arcade.Window):
             (self.width - 120) + (100 - self.world.player.lp), 30, self.world.player.lp * 2, 20, arcade.color.CHERRY)
 
     def draw_credit(self):
+        self.show_credit = True
         arcade.draw_texture_rectangle(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + self.credit_offset,
                                       SCREEN_WIDTH, SCREEN_HEIGHT, self.credit_background)
         arcade.draw_texture_rectangle(SCREEN_WIDTH // 2, (SCREEN_HEIGHT // 2 + self.credit_offset)-SCREEN_HEIGHT,
@@ -235,23 +238,27 @@ class Window(arcade.Window):
         self.draw_lp()
 
         if self.world.player.lp == -1:
-            texture = self.menu['score']
-            arcade.draw_texture_rectangle(
-                self.width//2, self.height//2+200, texture.width, texture.height, texture, 0)
-            arcade.draw_text(str(int(self.world.score)),
-                             self.width//2-80, 475,
-                             arcade.color.WHITE, 100)
-            texture = self.menu['play']
-            arcade.draw_texture_rectangle(
-                self.width//2, self.height//2, texture.width, texture.height, texture, 0)
-            texture = self.menu['credit']
-            arcade.draw_texture_rectangle(
-                self.width//2, self.height//2-200, texture.width, texture.height, texture, 0)
-            texture = self.menu['quit']
-            arcade.draw_texture_rectangle(
-                self.width-60, self.height-55, texture.width, texture.height, texture, 0)
+            self.draw_gui()
+
+    def draw_gui(self):
+        texture = self.menu['score']
+        arcade.draw_texture_rectangle(
+            self.width//2, self.height//2+200, texture.width, texture.height, texture, 0)
+        arcade.draw_text(str(int(self.world.score)),
+                         self.width//2-80, 475,
+                         arcade.color.WHITE, 100)
+        texture = self.menu['play']
+        arcade.draw_texture_rectangle(
+            self.width//2, self.height//2, texture.width, texture.height, texture, 0)
+        texture = self.menu['credit']
+        arcade.draw_texture_rectangle(
+            self.width//2, self.height//2-200, texture.width, texture.height, texture, 0)
+        texture = self.menu['quit']
+        arcade.draw_texture_rectangle(
+            self.width-60, self.height-55, texture.width, texture.height, texture, 0)
 
         if self.check_credit:
+            self.show_credit = True
             self.draw_credit()
 
     def replay(self, x, y):
@@ -261,7 +268,7 @@ class Window(arcade.Window):
                 self.world.start()
 
     def credit(self, x, y):
-        if ((self.height//2)-200) - (70) <= y <= ((self.height//2)-200) + (70)and self.width//2-205 <= x <= self.width//2+205:
+        if ((self.height//2)-200) - (95) <= y <= ((self.height//2)-200) + (95)and self.width//2-95 <= x <= self.width//2+95:
             self.check_credit = True
 
     def quit_game(self, x, y):
@@ -269,10 +276,18 @@ class Window(arcade.Window):
             if self.height-90 <= y <= self.height-20 and self.width-108 <= x <= self.width - 10:
                 exit()
 
+    def draw_gui_again(self, x, y):
+        if y <= self.height and x <= self.width:
+            self.check_credit = False
+            self.show_credit = False
+
     def on_mouse_press(self, x, y, button, modifiers):
-        self.replay(x, y)
-        self.credit(x, y)
-        self.quit_game(x, y)
+        if not self.show_credit:
+            self.replay(x, y)
+            self.credit(x, y)
+            self.quit_game(x, y)
+        else:
+            self.draw_gui_again(x, y)
 
 
 def main():

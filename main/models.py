@@ -96,7 +96,6 @@ class Fire:
         self.plus_speed = 0.1
         self.change_x = 0
         self.change_y = 0
-        self.hit = False
 
     def update(self, delta):
         if self.world.player.lp > 0:
@@ -122,10 +121,10 @@ class Fire:
                 self.change_y = math.sin(angle) * Fire.FIRE_SPEED
 
     def fire_hit(self, player):
-        if self.hit == False:
-            self.hit = fire_hit(player.x, player.y,
-                                self.x, self.y)
-            return self.hit
+        if self.world.hit == False:
+            self.world.hit = fire_hit(player.x, player.y,
+                                      self.x, self.y)
+            return self.world.hit
         else:
             return False
 
@@ -152,6 +151,8 @@ class Arrow:
         pass
 
     def hit(self, player):
+        if self.world.hit:
+            return False
         return is_hit(player.x, player.y,
                       self.x, self.y)
 
@@ -172,6 +173,7 @@ class World:
         self.state = World.STATE_FROZEN
         self.score = 0
         self.bottomfire = []
+        self.hit = False
 
         for i in range(self.arrowNumbers):
             self.arrows.append(
@@ -210,7 +212,6 @@ class World:
                 self.player.check = True
                 self.player.lp = -1
                 hot.play()
-
             else:
                 i.update(delta)
 
@@ -225,7 +226,6 @@ class World:
                 self.player.lp -= 1
                 nope.play()
             elif self.player.lp < 0:
-                # self.die()
                 self.player.lp = -1
                 nope.stop()
             else:
