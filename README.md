@@ -28,11 +28,18 @@ This is an endless arcade game.The player have to servie from the deathly arrow 
 
 ## How to play
 
+- Keep away for the hell flames and the arrows
+- Every time you hit the arrows, your life point will decrese by one.
+- But if you hit the hell flames, you will be lost immediately.
+
+### Controlling
+
 <pre>
 Use Arrows to control the character
 1.Press up   = Move character upword
 2.Press left = Move character to the left
 3.Press right = Move character to the right
+
 </pre>
 
 ## Developer Documents
