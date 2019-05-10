@@ -17,7 +17,7 @@ This is an endless arcade game.The player have to servie from the deathly arrow 
 
    <pre>
     $(your_workspace)cd Icarus-Falls
-    $(Icarus-Falls) pip install -r requirements.txt
+    $(Icarus-Falls) pip install -r requirement.txt
    </pre>
 
 4. Go to the main folder and run file Icarus.py
