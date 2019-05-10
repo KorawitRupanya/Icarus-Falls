@@ -135,13 +135,19 @@ class Window(arcade.Window):
         self.start()
 
         self.menu = {'score': arcade.load_texture(".././images/Back ground/loser-score-board.png"),
-                     'play': arcade.load_texture(".././images/Back ground/replay.png"),
-                     'credit': arcade.load_texture(".././images/Back ground/credit.png"),
-                     'quit': arcade.load_texture(".././images/Back ground/QuitButton.png")}
+                     'play': arcade.load_texture(".././images/button/replay.png"),
+                     'credit': arcade.load_texture(".././images/button/credit.png"),
+                     'quit': arcade.load_texture(".././images/button/QuitButton.png")}
+
+        self.credit_background = arcade.load_texture(
+            ".././images/Back ground/credit.jpg"
+        )
 
     def start(self):
         self.world = World(SCREEN_WIDTH, SCREEN_HEIGHT)
         self.offset = 0
+        self.credit_offset = 0
+        self.check_credit = False
         self.arrows = []
         self.fires = []
         self.numArrow = 5
@@ -180,6 +186,12 @@ class Window(arcade.Window):
         arcade.draw_rectangle_filled(
             (self.width - 120) + (100 - self.world.player.lp), 30, self.world.player.lp * 2, 20, arcade.color.CHERRY)
 
+    def draw_credit(self):
+        arcade.draw_texture_rectangle(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + self.credit_offset,
+                                      SCREEN_WIDTH, SCREEN_HEIGHT, self.credit_background)
+        arcade.draw_texture_rectangle(SCREEN_WIDTH // 2, (SCREEN_HEIGHT // 2 + self.credit_offset)-SCREEN_HEIGHT,
+                                      SCREEN_WIDTH, SCREEN_HEIGHT, self.credit_background)
+
     def update(self, delta):
         self.world.update(delta)
         if self.world.is_dead():
@@ -192,6 +204,10 @@ class Window(arcade.Window):
         if (self.world.arrowNumbers != self.numArrow):
             self.arrows.append(ArrowSprite(model=self.world.arrow[-1]))
             self.numArrow = self.world.arrowNumbers
+
+        if self.check_credit:
+            self.credit_offset += 1
+            self.credit_offset %= SCREEN_HEIGHT
 
     def on_draw(self):
         arcade.start_render()
@@ -235,6 +251,9 @@ class Window(arcade.Window):
             arcade.draw_texture_rectangle(
                 self.width-60, self.height-55, texture.width, texture.height, texture, 0)
 
+        if self.check_credit:
+            self.draw_credit()
+
     def replay(self, x, y):
         if self.world.player.lp == -1:
             if self.width//2-205 <= x <= self.width//2+205 and self.height//2-70 <= y <= self.height//2+70:
@@ -242,13 +261,12 @@ class Window(arcade.Window):
                 self.world.start()
 
     def credit(self, x, y):
-        if self.world.player.lp == -1:
-            if ((self.height//2)-200) - (95) <= y <= ((self.height//2)-200) + (95)and self.width//2-95 <= x <= self.width//2+95:
-                print('credit')
+        if ((self.height//2)-200) - (70) <= y <= ((self.height//2)-200) + (70)and self.width//2-205 <= x <= self.width//2+205:
+            self.check_credit = True
 
     def quit_game(self, x, y):
         if self.world.player.lp == -1:
-            if self.height-80 <= y <= self.height-20 and self.width-108 <= x <= self.width + 28:
+            if self.height-90 <= y <= self.height-20 and self.width-108 <= x <= self.width - 10:
                 exit()
 
     def on_mouse_press(self, x, y, button, modifiers):

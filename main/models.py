@@ -63,7 +63,7 @@ class Player:
             if self.x > self.world.width+30:
                 self.x = -30
             if self.y+35 >= self.world.height:
-                self.vy *= -1
+                self.vy *= -5
             self.vy -= Player.GRAVITY
             if self.y <= 85:
                 self.lp = -1
@@ -96,6 +96,7 @@ class Fire:
         self.plus_speed = 0.1
         self.change_x = 0
         self.change_y = 0
+        self.hit = False
 
     def update(self, delta):
         if self.world.player.lp > 0:
@@ -121,8 +122,12 @@ class Fire:
                 self.change_y = math.sin(angle) * Fire.FIRE_SPEED
 
     def fire_hit(self, player):
-        return fire_hit(player.x, player.y,
-                        self.x, self.y)
+        if self.hit == False:
+            self.hit = fire_hit(player.x, player.y,
+                                self.x, self.y)
+            return self.hit
+        else:
+            return False
 
 
 class Arrow:
@@ -135,15 +140,8 @@ class Arrow:
         self.vy = 0.1
 
     def up_speed(self):
-        if(self.world.score % 100 == 0):
+        if self.world.score % 100 == 0:
             self.speed += self.vy
-
-    def freeze_arrow(self):
-        self.speed = 0
-
-    def is_position_negative(self):
-        if self.y < 0:
-            self.y = 0
 
     def update(self, delta):
         self.y -= self.speed
@@ -189,9 +187,6 @@ class World:
 
         self.generate_bottom_fire()
 
-        # sound = arcade.sound.load_sound(".././soundEffect/themeSong.wav")
-        # arcade.play_sound(sound)
-
     def generate_bottom_fire(self):
         self.bottomfire.append(BottomFire(self, 30, 30))
         self.bottomfire.append(BottomFire(self, 90, 30))
@@ -215,6 +210,7 @@ class World:
                 self.player.check = True
                 self.player.lp = -1
                 hot.play()
+
             else:
                 i.update(delta)
 
@@ -228,8 +224,8 @@ class World:
                 self.player.check = True
                 self.player.lp -= 1
                 nope.play()
-            elif(self.player.lp < 0):
-                self.die()
+            elif self.player.lp < 0:
+                # self.die()
                 self.player.lp = -1
                 nope.stop()
             else:
