@@ -41,4 +41,4 @@ Use Arrows to control the character
 
 ## Screenshot
 
-<img src ="images/Screen Shot 2562-05-10 at 13.55.45">
+<img src ="images/Screen Shot 2562-05-10 at 13.55.45.png">
